@@ -34,11 +34,23 @@ var canvas = {
     }
 };
 
+
+function makeCounter() {
+    var i = 0;
+    return function() {
+        return i++;
+    }
+};
+var id = makeCounter();
+
 var Ball = {
+
+
     create: function (color, dx, dy) {
         var newBall = Object.create(this);
         newBall.dx = dx;
         newBall.dy = dy;
+        newBall.id = id();
         newBall.width = 40;
         newBall.height = 40;
         newBall.element = document.createElement('div');
@@ -54,33 +66,76 @@ var Ball = {
     moveTo: function (x, y) {
         this.element.style.left = x + 'px';
         this.element.style.top = y + 'px';
-    },
-    changeDirectionIfNecessary: function (x, y) {
-        if (x < 0 || x > canvas.width - this.width) {
-            this.dx = -this.dx;
-        }
-        if (y < 0 || y > canvas.height - this.height) {
-            this.dy = -this.dy;
-        }
-    },
-    draw: function (x, y) {
-        this.moveTo(x, y);
-        var ball = this;
-        setTimeout(function () {
-            ball.changeDirectionIfNecessary(x, y);
-            ball.draw(x + ball.dx, y + ball.dy);
-        }, 1000 / 60);
     }
+
 };
 
 canvas.initialize();
 var ball1 =  Ball.create("blue", 4, 3);
 var ball2 =  Ball.create("red", 1, 5);
 
+pos = [[70, 0],[20, 100]]
+vel = [[4, 3],[1, 5]]
 
-ball1.draw(70, 0);
-ball2.draw(20, 200);
+console.log(pos[0][0], vel[0])
+//ball1.draw(pos, vel);
+//ball2.draw(pos, vel);
 
+
+///////////////////////////////
+    function changeDirectionIfNecessary(pos, vel) {
+
+for(let i =0; i<2; i++)
+{
+        if (pos[i][0] < 0 || pos[i][0] > canvas.width - 40) {
+            vel[i][0] = -vel[i][0];
+        }
+        if (pos[i][1] < 0 || pos[i][1] > canvas.height - 40) {
+            vel[i][1] = -vel[i][1];
+        }
+}
+       return vel;
+    }
+
+
+
+     function updatevel(pos, vel) {
+        var vx1 = vel[0][0];
+        var vy1 = vel[0][1];
+        var vx2 = vel[1][0];
+        var vy2 = vel[1][1];
+ 
+        if (((pos[0][0]-pos[1][0])**2+(pos[0][1]-pos[1][1])**2)**.5 < 42) {
+        vel[0][0] =vx2;
+        vel[0][1] =vy2;
+        vel[1][0] =vx1;
+        vel[1][1] =vy1;
+}
+return vel;
+}
+
+
+  function draw(pos, vel) {
+        ball1.moveTo(pos[0][0], pos[0][1]);
+        ball2.moveTo(pos[1][0], pos[1][1]);
+
+        setTimeout(function () {
+
+            vel = updatevel(pos, vel);
+            vel = changeDirectionIfNecessary(pos, vel);
+            
+            for(let i =0; i<2; i++){
+            pos[i][0] = pos[i][0] + vel[i][0]
+            pos[i][1] = pos[i][1] + vel[i][1]
+ 
+            }
+draw(pos, vel);
+
+        }, 1000 / 60);
+    }
+
+
+draw(pos, vel)
 
 </script>
 
